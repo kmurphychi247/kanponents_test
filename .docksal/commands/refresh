@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+## Refresh DB
+##
+## Usage: fin refresh [environment id]
+## Defaults to the primary environment but can take an environment name as a parameter: fin refresh pr-123
+
+# Abort if anything fails
+set -e
+
+ENVIRONMENT=${1:-"$hostingenv"}
+DOCROOT_PATH="${PROJECT_ROOT}/${DOCROOT}"
+
+echo "Pulling Database..."
+fin pull db -y --hosting-env=${ENVIRONMENT}
+
+cd ${DOCROOT_PATH}
+
+echo "Clear cache"
+fin drush cr -y
+
+echo "Update Drupal DB"
+fin drush updatedb -y
+
+echo "Clear cache"
+fin drush cr -y
